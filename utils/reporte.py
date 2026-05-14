@@ -5,33 +5,66 @@ Created on Wed May 13 11:48:23 2026
 @author: calex
 """
 
-from docx import Document
-from docx.shared import Pt, RGBColor
+from docxtpl import DocxTemplate
 from io import BytesIO
 from datetime import datetime
 
-def generar_reporte(nombre, materia, resultado):
-    doc = Document()
+def generar_reporte(nombre, materia, resultado, preguntas_df):
+    doc = DocxTemplate("machote.docx")
 
-    doc.add_heading(f'Reporte de Examen — {materia}', 0)
-    doc.add_paragraph(f'Alumno: {nombre}')
-    doc.add_paragraph(f'Fecha: {datetime.now().strftime("%d/%m/%Y %H:%M")}')
-    doc.add_paragraph(f'Calificación automática: {resultado["calificacion"]}/{resultado["total"]} pts')
-    doc.add_paragraph('')
+    # Calcular porcentaje
+    if resultado['total'] > 0:
+        porcentaje = round((resultado['calificacion'] / resultado['total']) * 100, 1)
+    else:
+        porcentaje = 0
 
-    doc.add_heading('Detalle de respuestas', level=1)
+    # Preparar datos de cada pregunta
+    preguntas_contexto = []
+    for i, d in enumerate(resultado['detalles']):
+        pregunta = preguntas_df.iloc[i]
 
-    for i, detalle in enumerate(resultado['detalles']):
-        doc.add_paragraph(f'{i+1}. {detalle["pregunta"]}', style='List Number')
-        doc.add_paragraph(f'   Respuesta: {detalle["respuesta_alumno"]}')
+        if d['tipo'] == 'multiple':
+            # Encontrar el texto de la respuesta del alumno
+            letra = str(d['respuesta_alumno']).upper()
+            col_map = {'A': 'opcion_a', 'B': 'opcion_b', 
+                      'C': 'opcion_c', 'D': 'opcion_d'}
+            texto_resp = pregunta.get(col_map.get(letra, 'opcion_a'), '')
 
-        if detalle['tipo'] == 'multiple':
-            estado = '✅ Correcto' if detalle['correcto'] else f'❌ Incorrecto (correcta: {detalle["respuesta_correcta"]})'
-            doc.add_paragraph(f'   {estado} — {detalle["puntos"]}/{detalle["puntos_posibles"]} pts')
+            estado = "✅ Correcto" if d['correcto'] else f"❌ Incorrecto (correcta: {d['respuesta_correcta']})"
+            puntos = d['puntos']
         else:
-            doc.add_paragraph(f'   ⏳ Pendiente de revisión — 0/{detalle["puntos_posibles"]} pts')
+            texto_resp = ""
+            estado = "⏳ Pendiente de revisión"
+            puntos = 0
 
-        doc.add_paragraph('')
+        preguntas_contexto.append({
+            'numero': i + 1,
+            'pregunta': d['pregunta'],
+            'tipo': d['tipo'],
+            'opcion_a': pregunta.get('opcion_a', ''),
+            'opcion_b': pregunta.get('opcion_b', ''),
+            'opcion_c': pregunta.get('opcion_c', ''),
+            'opcion_d': pregunta.get('opcion_d', ''),
+            'respuesta_alumno': d['respuesta_alumno'],
+            'texto_respuesta': texto_resp,
+            'respuesta_correcta': d.get('respuesta_correcta', ''),
+            'estado': estado,
+            'puntos': puntos,
+            'puntos_posibles': d['puntos_posibles']
+        })
+
+    # Contexto completo para el machote
+    contexto = {
+        'nombre': nombre,
+        'materia': materia,
+        'fecha': datetime.now().strftime("%d/%m/%Y %H:%M"),
+        'calificacion': resultado['calificacion'],
+        'total': resultado['total'],
+        'porcentaje': porcentaje,
+        'preguntas': preguntas_contexto
+    }
+
+    doc.render(contexto)
 
     buffer = BytesIO()
     doc.save(buffer)

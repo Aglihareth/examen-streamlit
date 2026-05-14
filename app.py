@@ -69,10 +69,7 @@ if not st.session_state.enviado:
                         guardar_resultado(nombre, materia, resultado)
                         st.write("✅ Respuestas guardadas")  # debug
                     except Exception as e:
-                        if "200" in str(e):
-                            st.write("✅ Respuestas guardadas")
-                        else:
-                            st.error(f"Error al guardar: {e}")
+                        st.error(f"❌ Error exacto: {type(e).__name__}: {e}")
 
                     st.session_state.enviado = True
                     st.session_state.resultado = resultado

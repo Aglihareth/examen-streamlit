@@ -10,6 +10,9 @@ from io import BytesIO
 from datetime import datetime
 
 def generar_reporte(nombre, materia, resultado, preguntas_df):
+    import streamlit as st
+    st.write("usando reporte con machote")
+    
     doc = DocxTemplate("machote.docx")
 
     # Calcular porcentaje

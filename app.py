@@ -84,7 +84,7 @@ if not st.session_state.enviado:
                 
                 
                 resultado = calificar_examen(preguntas, respuestas)
-                doc_bytes = generar_reporte(nombre, materia, resultado)
+                doc_bytes = generar_reporte(nombre, materia, resultado, preguntas)
 
 
 # ── PANTALLA DE RESULTADOS ──

@@ -4,3 +4,4 @@ google-auth
 pandas
 python-docx
 google-api-python-client
+docxtpl

@@ -30,7 +30,7 @@ def guardar_resultado(nombre, materia, resultado):
     cliente = _get_cliente()
     st.write("✅ Cliente conectado")
     
-    sheet = cliente.open("ExamenStreamlit").worksheet("Resultados")
+    sheet = cliente.open("Examenes").worksheet("Resultados")
     st.write(f"✅ Hoja encontrada: {sheet.title}")
 
     detalle = ""

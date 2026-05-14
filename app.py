@@ -60,7 +60,7 @@ if not st.session_state.enviado:
             else:
                 try:
                     resultado = calificar_examen(preguntas, respuestas)
-                    doc_bytes = generar_reporte(nombre, materia, resultado)
+                    doc_bytes = generar_reporte(nombre, materia, resultado, preguntas)
                     st.write("✅ Reporte generado")  # debug
 
                     nombre_archivo = f"{nombre}{materia}{datetime.now().strftime('%d%m%Y_%H%M')}.docx"

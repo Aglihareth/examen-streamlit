@@ -65,9 +65,14 @@ if not st.session_state.enviado:
 
                     nombre_archivo = f"{nombre}{materia}{datetime.now().strftime('%d%m%Y_%H%M')}.docx"
                     st.write(f"📤 Subiendo archivo: {nombre_archivo}")  # debug
-
-                    guardar_resultado(nombre, materia, resultado)
-                    st.write("✅ Subido a Drive")  # debug
+                    try:
+                        guardar_resultado(nombre, materia, resultado)
+                        st.write("✅ Respuestas guardadas")  # debug
+                    except Exception as e:
+                        if "200" in str(e):
+                            st.write("✅ Respuestas guardadas")
+                        else
+                            st.error(f"Error al guardar: {e}")
 
                     st.session_state.enviado = True
                     st.session_state.resultado = resultado

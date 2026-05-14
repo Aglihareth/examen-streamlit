@@ -9,17 +9,25 @@ import gspread
 from google.oauth2.service_account import Credentials
 from datetime import datetime
 
-def guardar_resultado(nombre, materia, resultado):
-    scopes = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+def _get_cliente():
+    scopes = ["https://spreadsheets.google.com/feeds",
+              "https://www.googleapis.com/auth/drive"]
     try:
-        creds = Credentials.from_service_account_file("credenciales.json", scopes=scopes)
+        creds = Credentials.from_service_account_file(
+            "credenciales.json", scopes=scopes
+        )
     except FileNotFoundError:
         import streamlit as st
-        creds = Credentials.from_service_account_info(dict(st.secrets["gcp_service_account"]), scopes=scopes)
+        creds = Credentials.from_service_account_info(
+            dict(st.secrets["gcp_service_account"]),
+            scopes=scopes
+        )
+    return gspread.authorize(creds)
 
-    sheet = cliente.open("Examenes").worksheet("Resultados")
+def guardar_resultado(nombre, materia, resultado):
+    cliente = _get_cliente()  # ← ahora sí está definido
+    sheet = cliente.open("ExamenStreamlit").worksheet("Resultados")
 
-    # Armar resumen de respuestas
     detalle = ""
     for i, d in enumerate(resultado['detalles']):
         if d['tipo'] == 'multiple':
@@ -28,7 +36,6 @@ def guardar_resultado(nombre, materia, resultado):
         else:
             detalle += f"P{i+1}: [Abierta: {d['respuesta_alumno'][:30]}...] | "
 
-    # Agregar fila
     sheet.append_row([
         datetime.now().strftime("%d/%m/%Y %H:%M"),
         nombre,

@@ -12,7 +12,11 @@ import random
 
 def _get_cliente():
     scopes = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = Credentials.from_service_account_file("credenciales.json", scopes=scopes)
+    try:
+        creds = Credentials.from_service_account_file("credenciales.json", scopes=scopes)
+    except FileNotFoundError:
+        import streamlit as st
+        creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scopes)
     return gspread.authorize(creds)
 
 def obtener_materias():

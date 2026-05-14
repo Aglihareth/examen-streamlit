@@ -25,8 +25,13 @@ def _get_cliente():
     return gspread.authorize(creds)
 
 def guardar_resultado(nombre, materia, resultado):
-    cliente = _get_cliente()  # ← ahora sí está definido
+    import streamlit as st
+    
+    cliente = _get_cliente()
+    st.write("✅ Cliente conectado")
+    
     sheet = cliente.open("ExamenStreamlit").worksheet("Resultados")
+    st.write(f"✅ Hoja encontrada: {sheet.title}")
 
     detalle = ""
     for i, d in enumerate(resultado['detalles']):
@@ -36,11 +41,15 @@ def guardar_resultado(nombre, materia, resultado):
         else:
             detalle += f"P{i+1}: [Abierta: {d['respuesta_alumno'][:30]}...] | "
 
-    sheet.append_row([
+    fila = [
         datetime.now().strftime("%d/%m/%Y %H:%M"),
         nombre,
         materia,
         resultado['calificacion'],
         resultado['total'],
         detalle
-    ])
+    ]
+    st.write(f"📝 Datos a escribir: {fila}")  # ← ver qué se intenta guardar
+    
+    sheet.append_row(fila, value_input_option='USER_ENTERED')
+    st.write("✅ Fila agregada")

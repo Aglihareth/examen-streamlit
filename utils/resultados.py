@@ -25,34 +25,29 @@ def _get_cliente():
     return gspread.authorize(creds)
 
 def guardar_resultado(nombre, materia, resultado):
-    import streamlit as st
-    
     cliente = _get_cliente()
-    st.write("✅ Cliente conectado")
-    
-    sheet = cliente.open("Examenes").worksheet("Resultados")
-    st.write(f"✅ Hoja encontrada: {sheet.title}")
+    spreadsheet = cliente.open("Examenes")
+    sheet = spreadsheet.worksheet("Resultados")
 
     detalle = ""
     for i, d in enumerate(resultado['detalles']):
         if d['tipo'] == 'multiple':
-            estado = "✅" if d['correcto'] else "❌"
-            detalle += f"P{i+1}: {estado} ({d['respuesta_alumno']}) | "
+            estado = "SI" if d['correcto'] else "NO"
+            detalle += f"P{i+1}:{estado}({d['respuesta_alumno']}) | "
         else:
-            if st.session_stage.get("error_sheets"):
-                st.error(f"error guardar en Sheets: {st.session_state.error_sheets}")
-            Resultado = st.session_state.resultado
-            detalle += f"P{i+1}: [Abierta: {d['respuesta_alumno'][:30]}...] | "
+            texto = str(d['respuesta_alumno'])[:30]
+            detalle += f"P{i+1}:Abierta({texto}) | "
 
     fila = [
         datetime.now().strftime("%d/%m/%Y %H:%M"),
-        nombre,
-        materia,
-        resultado['calificacion'],
-        resultado['total'],
-        detalle
+        str(nombre),
+        str(materia),
+        int(resultado['calificacion']),
+        int(resultado['total']),
+        str(detalle)
     ]
-    st.write(f"📝 Datos a escribir: {fila}")  # ← ver qué se intenta guardar
-    
-    sheet.append_row(fila, value_input_option='USER_ENTERED')
-    st.write("✅ Fila agregada")
+
+    # Obtener siguiente fila vacía y escribir directamente
+    siguiente_fila = len(sheet.get_all_values()) + 1
+    rango = f"A{siguiente_fila}:F{siguiente_fila}"
+    sheet.update(rango, [fila])

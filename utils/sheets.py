@@ -16,7 +16,7 @@ def _get_cliente():
         creds = Credentials.from_service_account_file("credenciales.json", scopes=scopes)
     except FileNotFoundError:
         import streamlit as st
-        creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scopes)
+        creds = Credentials.from_service_account_info(dict(st.secrets["gcp_service_account"]), scopes=scopes)
     return gspread.authorize(creds)
 
 def obtener_materias():

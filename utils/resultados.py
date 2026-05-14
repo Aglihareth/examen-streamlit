@@ -39,6 +39,9 @@ def guardar_resultado(nombre, materia, resultado):
             estado = "✅" if d['correcto'] else "❌"
             detalle += f"P{i+1}: {estado} ({d['respuesta_alumno']}) | "
         else:
+            if st.session_stage.get("error_sheets"):
+                st.error(f"error guardar en Sheets: {st.session_state.error_sheets}")
+            Resultado = st.session_state.resultado
             detalle += f"P{i+1}: [Abierta: {d['respuesta_alumno'][:30]}...] | "
 
     fila = [

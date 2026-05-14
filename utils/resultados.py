@@ -15,7 +15,7 @@ def guardar_resultado(nombre, materia, resultado):
         creds = Credentials.from_service_account_file("credenciales.json", scopes=scopes)
     except FileNotFoundError:
         import streamlit as st
-        creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scopes)
+        creds = Credentials.from_service_account_info(dict(st.secrets["gcp_service_account"]), scopes=scopes)
 
     sheet = cliente.open("Examenes").worksheet("Resultados")
 

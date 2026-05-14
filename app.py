@@ -71,7 +71,7 @@ if not st.session_state.enviado:
                     except Exception as e:
                         if "200" in str(e):
                             st.write("✅ Respuestas guardadas")
-                        else
+                        else:
                             st.error(f"Error al guardar: {e}")
 
                     st.session_state.enviado = True

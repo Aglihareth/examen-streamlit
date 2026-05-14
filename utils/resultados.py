@@ -11,8 +11,11 @@ from datetime import datetime
 
 def guardar_resultado(nombre, materia, resultado):
     scopes = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = Credentials.from_service_account_file("credenciales.json", scopes=scopes)
-    cliente = gspread.authorize(creds)
+    try:
+        creds = Credentials.from_service_account_file("credenciales.json", scopes=scopes)
+    except FileNotFoundError:
+        import streamlit as st
+        creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scopes)
 
     sheet = cliente.open("Examenes").worksheet("Resultados")
 

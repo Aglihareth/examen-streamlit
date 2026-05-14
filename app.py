@@ -67,6 +67,7 @@ if not st.session_state.enviado:
                     st.write(f"📤 Subiendo archivo: {nombre_archivo}")  # debug
                     try:
                         guardar_resultado(nombre, materia, resultado)
+                        st.session_state.error_sheets=None
                         st.write("✅ Respuestas guardadas")  # debug
                     except Exception as e:
                         st.session_state.error_sheets=f"❌ Error exacto: {type(e).__name__}: {e}"

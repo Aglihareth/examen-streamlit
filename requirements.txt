@@ -1,0 +1,6 @@
+streamlit
+gspread
+google-auth
+pandas
+python-docx
+google-api-python-client

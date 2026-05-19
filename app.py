@@ -29,7 +29,7 @@ if not st.session_state.enviado:
         # ✅ Solo carga las preguntas una vez
         clave = f"preguntas_{nombre}_{materia}"
         if clave not in st.session_state:
-            st.session_state[clave] = cargar_preguntas(materia)
+            st.session_state[clave] = cargar_preguntas(materia, num_preguntas=10)
    
         preguntas = st.session_state[clave]
         respuestas = {}
